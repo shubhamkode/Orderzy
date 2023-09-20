@@ -4,7 +4,6 @@ import { FC } from "react";
 import * as zod from "zod";
 import { User } from "@prisma/client";
 
-import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
 import { useForm } from "react-hook-form";
