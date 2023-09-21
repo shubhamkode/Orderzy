@@ -1,10 +1,14 @@
-# ORDER TAKER
+ORDER TAKER
+=====
 
-> An app to take high speed order in fooding business.
+> A FullStack App to Take High Speed Orders.  
 
 ## Author 
 
 - [Shubham Agarwal](https://github.com/shubhamkode)
 
 ## Features 
- - [ ] - CRUD Items
+ - [x] - CRUD Items
+ - [ ] - Manage Cart
+ - [ ] - CRUD Orders
+ - [ ] - Statistics

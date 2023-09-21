@@ -14,12 +14,15 @@ import { Button } from "@/components/ui/button";
 
 import { Item } from "@prisma/client";
 import Link from "next/link";
+import useStoreHook from "@/features/hooks/useStoreHook";
 
 interface IItemCardProps {
   item: Item;
 }
 
 const ItemCard: FC<IItemCardProps> = ({ item }) => {
+  const { isItemInCart, addItemToCart } = useStoreHook({ itemId: item.id });
+
   return (
     <Card className="w-full max-w-[400px] p-0">
       <Link href={`/item/${item.id}`}>
@@ -43,9 +46,19 @@ const ItemCard: FC<IItemCardProps> = ({ item }) => {
           </CardDescription>
         </Link>
 
-        <Button className="px-3">
-          <Plus size={22} />
-          Add
+        <Button
+          className="px-3"
+          onClick={() => addItemToCart()}
+          disabled={isItemInCart}
+        >
+          {!isItemInCart ? (
+            <>
+              <Plus size={22} />
+              Add
+            </>
+          ) : (
+            <>Added To Cart</>
+          )}
         </Button>
       </CardContent>
     </Card>

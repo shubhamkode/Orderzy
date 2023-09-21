@@ -26,10 +26,12 @@ import * as zod from "zod";
 import { useSession } from "next-auth/react";
 import { CreateNewItem } from "@/features/lib/providers/ItemProvider";
 import { useRouter } from "next/navigation";
+import { Textarea } from "@/components/ui/textarea";
 
 const createNewItemSchema = zod.object({
   name: zod.string().min(1, "Name is Required"),
   price: zod.string().min(1, "Price is Required"),
+  description: zod.string().nullish(),
 });
 
 type CreateNewItem = zod.infer<typeof createNewItemSchema>;
@@ -44,6 +46,7 @@ export default function DialogSection() {
     defaultValues: {
       name: "",
       price: "",
+      description: undefined,
     },
   });
 
@@ -57,6 +60,7 @@ export default function DialogSection() {
     const newItem = await CreateNewItem({
       name: values.name,
       price: Number(values.price),
+      description: values.description,
       userId: data.user.id,
     });
 
@@ -115,6 +119,20 @@ export default function DialogSection() {
               )}
             />
 
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    {/* @ts-ignore */}
+                    <Textarea {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <Button type="submit" className="mt-4">
               Upload
             </Button>

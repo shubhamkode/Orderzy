@@ -1,11 +1,7 @@
-import { getServerSession } from "next-auth";
-
-import { authOptions } from "@/features/lib/auth";
-import { redirect } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { getUserSession } from "@/features/lib/getUserSession";
+import { CartPageTemplate } from "@/templates";
 
 export default async function CartPage() {
-  const session = await getServerSession(authOptions);
 
-  return <div>CartPage</div>;
+  return <CartPageTemplate />;
 }

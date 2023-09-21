@@ -33,12 +33,12 @@ import * as zod from "zod";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Textarea } from "@/components/ui/textarea";
-import { revalidatePath } from "next/cache";
+import useStoreHook from "@/features/hooks/useStoreHook";
 
 const updateItemSchema = zod.object({
   name: zod.string().min(1, "Name is Required"),
   price: zod.string().min(1, "Price is Required"),
-  description: zod.string(),
+  description: zod.string().nullish(),
 });
 
 type UpdateNewItem = zod.infer<typeof updateItemSchema>;
@@ -51,7 +51,7 @@ function EditDialog({ item }: { item: Item }) {
     defaultValues: {
       name: item.name,
       price: String(item.price),
-      description: "",
+      description: item.description,
     },
   });
 
@@ -59,6 +59,7 @@ function EditDialog({ item }: { item: Item }) {
     const updatedItem = await UpdateItemById(item.id, item.userId, {
       name: values.name,
       price: Number(values.price),
+      description: values.description,
     });
     if (updatedItem) {
       setMenuOpen(false);
@@ -119,6 +120,7 @@ function EditDialog({ item }: { item: Item }) {
                 <FormItem>
                   <FormLabel>Description</FormLabel>
                   <FormControl>
+                    {/* @ts-ignore */}
                     <Textarea {...field} />
                   </FormControl>
                   <FormMessage />
@@ -137,14 +139,22 @@ function EditDialog({ item }: { item: Item }) {
 }
 
 interface IItemDescriptionPageTemplateProps {
-  item: Item;
+  item?: Item | null;
 }
 
 const ItemDescriptionPageTemplate: FC<IItemDescriptionPageTemplateProps> = ({
   item,
 }) => {
+  if (!item) {
+    return <h2>Item Not Found</h2>;
+  }
+
+  const { isItemInCart, addItemToCart, deleteItemInCart } = useStoreHook({
+    itemId: item.id,
+  });
+
   return (
-    <div className="container relative mx-auto mt-10  px-4 py-2">
+    <div className="relative mx-auto mt-10 max-w-2xl px-4 py-2">
       <div className="absolute right-8 top-5 ">
         <EditDialog item={item} />
       </div>
@@ -158,6 +168,9 @@ const ItemDescriptionPageTemplate: FC<IItemDescriptionPageTemplateProps> = ({
         <Link
           href="/"
           onClick={async () => {
+            if (isItemInCart) {
+              deleteItemInCart();
+            }
             await DeleteItemById(item.id, item.userId);
           }}
         >
@@ -170,7 +183,7 @@ const ItemDescriptionPageTemplate: FC<IItemDescriptionPageTemplateProps> = ({
         alt="Image"
         width="1000"
         height="1000"
-        className="aspect-[2.15/1.24] h-1/2 w-full rounded object-cover object-right-bottom shadow md:aspect-[1.75/0.75]"
+        className="aspect-[2.5/1.5] h-1/2 w-full rounded object-cover object-right-bottom shadow md:aspect-[1.75/0.75]"
       />
       <div className="mt-4  gap-y-2  rounded border-[1px] bg-white px-5 py-5 shadow">
         <div className="flex items-center justify-between">
@@ -182,19 +195,19 @@ const ItemDescriptionPageTemplate: FC<IItemDescriptionPageTemplateProps> = ({
 
         <p
           className={cn(
-            "mt-3 line-clamp-3 text-center text-sm tracking-wide text-gray-700",
+            "mt-1 line-clamp-3  text-sm tracking-wide text-gray-700",
           )}
         >
-          <Balancer>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Aspernatur
-            veritatis unde mollitia odit nesciunt voluptatibus sed tempore in,
-            dolorum architecto.
-          </Balancer>
+          <Balancer>{item.description}</Balancer>
         </p>
 
-        <div className="mt-5 flex items-center justify-end px-2">
-          <Button className="w-full whitespace-nowrap md:w-fit">
-            Add to Cart
+        <div className="mt-8 flex items-center justify-end">
+          <Button
+            className="w-full whitespace-nowrap md:w-fit"
+            disabled={isItemInCart}
+            onClick={() => addItemToCart()}
+          >
+            {isItemInCart ? "Added" : "Add to Cart"}
           </Button>
         </div>
       </div>

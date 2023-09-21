@@ -1,4 +1,5 @@
 import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 
 export const getUserSession = async () => {
   const session = await getServerSession({
@@ -11,7 +12,7 @@ export const getUserSession = async () => {
   });
 
   if (!session || !session.user) {
-    throw new Error("User is not In Session");
+    throw redirect("/");
   }
   return session.user;
 };

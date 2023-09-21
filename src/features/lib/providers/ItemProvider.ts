@@ -8,6 +8,7 @@ import prisma from "../prisma";
 interface ICreateNewItem {
   name: string;
   image?: string | null;
+  description?: string | null;
   price: number;
   userId: string;
 }
@@ -15,12 +16,13 @@ interface ICreateNewItem {
 export const CreateNewItem = async ({
   name,
   image,
+  description,
   price,
   userId,
 }: ICreateNewItem): Promise<Omit<Item, "userId">> => {
   return await prisma.item
     .create({
-      data: { name, price, image, userId },
+      data: { name, price, image, userId, description },
     })
     .then((data) => {
       revalidatePath("/");
@@ -47,7 +49,7 @@ export const GetItemById = async (
 export const UpdateItemById = async (
   itemId: string,
   userId: string,
-  { name, image, price }: Partial<ICreateNewItem>,
+  { name, image, price, description }: Partial<ICreateNewItem>,
 ): Promise<Omit<Item, "userId"> | null> => {
   const dbItem = await prisma.item.findUnique({
     where: { id: itemId, userId },
@@ -64,6 +66,7 @@ export const UpdateItemById = async (
         name,
         image,
         price,
+        description,
       },
     })
     .then((data) => {
